@@ -1,0 +1,63 @@
+# Dataset
+dataset/
+
+
+# Model checkpoints
+best_models/
+saved_models/
+
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+
+# Jupyter
+.ipynb_checkpoints/
+
+
+# Large model files
+*.pth
+*.pt
+*.ckpt
+*.pkl
+*.onnx
+*.bin
+
+
+# Virtual environment
+.env
+.venv
+venv/
+env/
+.venv/
+conda-env/
+*.conda
+
+
+# IDE settings
+.vscode/
+.idea/
+
+
+# Logs
+logs/
+*.log
+
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+
+# System files
+.DS_Store
+Thumbs.db
+
+
+# Python build
+build/
+dist/
+*.egg-info/
