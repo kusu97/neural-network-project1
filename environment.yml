@@ -1,0 +1,11 @@
+name: DLpj1
+channels:
+  - defaults
+dependencies:
+  - python=3.12
+  - numpy
+  - matplotlib
+  - tqdm
+  - pip
+  - pip:
+      - pypdf

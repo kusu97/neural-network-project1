@@ -50,6 +50,7 @@ logs/
 tmp/
 temp/
 *.tmp
+idx.pickle
 
 
 # System files
@@ -61,3 +62,7 @@ Thumbs.db
 build/
 dist/
 *.egg-info/
+
+
+# Report file
+report.md

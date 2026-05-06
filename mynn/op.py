@@ -20,8 +20,11 @@ class Linear(Layer):
     """
     def __init__(self, in_dim, out_dim, initialize_method=np.random.normal, weight_decay=False, weight_decay_lambda=1e-8) -> None:
         super().__init__()
-        self.W = initialize_method(size=(in_dim, out_dim))
-        self.b = initialize_method(size=(1, out_dim))
+        if initialize_method is np.random.normal:
+            self.W = initialize_method(loc=0.0, scale=np.sqrt(2.0 / in_dim), size=(in_dim, out_dim))
+        else:
+            self.W = initialize_method(size=(in_dim, out_dim))
+        self.b = np.zeros((1, out_dim))
         self.grads = {'W' : None, 'b' : None}
         self.input = None # Record the input for backward process.
 
@@ -39,7 +42,8 @@ class Linear(Layer):
         input: [batch_size, in_dim]
         out: [batch_size, out_dim]
         """
-        pass
+        self.input = X
+        return X @ self.W + self.b
 
     def backward(self, grad : np.ndarray):
         """
@@ -47,7 +51,11 @@ class Linear(Layer):
         output: [batch_size, in_dim] the grad to be passed to the previous layer.
         This function also calculates the grads for W and b.
         """
-        pass
+        assert self.input is not None, "Forward must be called before backward."
+        batch_size = self.input.shape[0]
+        self.grads['W'] = self.input.T @ grad / batch_size
+        self.grads['b'] = np.sum(grad, axis=0, keepdims=True) / batch_size
+        return grad @ self.W.T
     
     def clear_grad(self):
         self.grads = {'W' : None, 'b' : None}
@@ -107,7 +115,15 @@ class MultiCrossEntropyLoss(Layer):
     A multi-cross-entropy loss layer, with Softmax layer in it, which could be cancelled by method cancel_softmax
     """
     def __init__(self, model = None, max_classes = 10) -> None:
-        pass
+        super().__init__()
+        self.model = model
+        self.max_classes = max_classes
+        self.has_softmax = True
+        self.predicts = None
+        self.labels = None
+        self.probs = None
+        self.grads = None
+        self.optimizable = False
 
     def __call__(self, predicts, labels):
         return self.forward(predicts, labels)
@@ -118,12 +134,24 @@ class MultiCrossEntropyLoss(Layer):
         labels : [batch_size, ]
         This function generates the loss.
         """
-        # / ---- your codes here ----/
-        pass
+        labels = labels.astype(np.int64)
+        self.predicts = predicts
+        self.labels = labels
+
+        if self.has_softmax:
+            probs = softmax(predicts)
+        else:
+            probs = predicts
+        self.probs = np.clip(probs, 1e-12, 1.0)
+
+        batch_size = predicts.shape[0]
+        return -np.mean(np.log(self.probs[np.arange(batch_size), labels]))
     
     def backward(self):
         # first compute the grads from the loss to the input
-        # / ---- your codes here ----/
+        batch_size = self.predicts.shape[0]
+        self.grads = self.probs.copy()
+        self.grads[np.arange(batch_size), self.labels] -= 1
         # Then send the grads to model for back propagation
         self.model.backward(self.grads)
 
