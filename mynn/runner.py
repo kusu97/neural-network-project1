@@ -28,7 +28,7 @@ class RunnerM():
         save_dir = kwargs.get("save_dir", "best_model")
 
         if not os.path.exists(save_dir):
-            os.mkdir(save_dir)
+            os.makedirs(save_dir)
 
         best_score = 0
 
