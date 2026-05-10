@@ -67,7 +67,7 @@ runner.train(
         num_epochs=10,
         log_iters=100,
         eval_iters=100,
-        save_dir=r'./best_models',
+        save_dir=r'./best_models/part_a_mlp',
 )
 
 os.makedirs('figs', exist_ok=True)
@@ -79,7 +79,7 @@ plot(runner, axes)
 _.suptitle('Part A MLP baseline learning curves')
 _.savefig(r'./figs/part_a_mlp_learning_curve.png', dpi=200)
 
-with open(r'./best_models/part_a_mlp_history.pickle', 'wb') as f:
+with open(r'./best_models/part_a_mlp/history.pickle', 'wb') as f:
         pickle.dump(
                 {
                         'train_loss': runner.train_loss,

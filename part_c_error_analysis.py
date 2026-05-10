@@ -84,7 +84,7 @@ os.makedirs('analysis_results', exist_ok=True)
 test_imgs, test_labs = load_mnist_test()
 
 mlp = nn.models.Model_MLP()
-mlp.load_model(r'.\best_models\best_model.pickle')
+mlp.load_model(r'.\best_models\part_a_mlp\best_model.pickle')
 mlp_logits = mlp(test_imgs)
 mlp_preds = np.argmax(mlp_logits, axis=1)
 mlp_matrix = confusion_matrix(test_labs, mlp_preds)

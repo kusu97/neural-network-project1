@@ -1,3 +1,4 @@
+"""Evaluate the saved Part A MLP baseline on the MNIST test set."""
 import mynn as nn
 import numpy as np
 from struct import unpack
@@ -6,7 +7,7 @@ import matplotlib.pyplot as plt
 import pickle
 
 model = nn.models.Model_MLP()
-model.load_model(r'.\best_models\best_model.pickle')
+model.load_model(r'.\best_models\part_a_mlp\best_model.pickle')
 
 test_images_path = r'.\dataset\MNIST\t10k-images-idx3-ubyte.gz'
 test_labels_path = r'.\dataset\MNIST\t10k-labels-idx1-ubyte.gz'
