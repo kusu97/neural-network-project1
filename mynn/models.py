@@ -78,12 +78,13 @@ class Model_CNN(Layer):
     """
     A model with conv2D layers. Implement it using the operators you have written in op.py
     """
-    def __init__(self, lambda_list=None):
+    def __init__(self, lambda_list=None, dropout_p=0.0):
         self.input_shape = (1, 28, 28)
         self.conv_channels = 8
         self.hidden_dim = 128
         self.num_classes = 10
         self.lambda_list = lambda_list
+        self.dropout_p = dropout_p
 
         self.conv = conv2D(
             in_channels=1,
@@ -95,8 +96,9 @@ class Model_CNN(Layer):
         self.relu1 = ReLU()
         self.fc1 = Linear(self.conv_channels * 14 * 14, self.hidden_dim)
         self.relu2 = ReLU()
+        self.dropout = Dropout(dropout_p)
         self.fc2 = Linear(self.hidden_dim, self.num_classes)
-        self.layers = [self.conv, self.relu1, self.fc1, self.relu2, self.fc2]
+        self.layers = [self.conv, self.relu1, self.fc1, self.relu2, self.dropout, self.fc2]
 
         if lambda_list is not None:
             optimizable_layers = [layer for layer in self.layers if layer.optimizable]
@@ -120,23 +122,31 @@ class Model_CNN(Layer):
         outputs = outputs.reshape(outputs.shape[0], -1)
         outputs = self.fc1(outputs)
         outputs = self.relu2(outputs)
+        outputs = self.dropout(outputs)
         outputs = self.fc2(outputs)
         return outputs
 
     def backward(self, loss_grad):
         grads = self.fc2.backward(loss_grad)
+        grads = self.dropout.backward(grads)
         grads = self.relu2.backward(grads)
         grads = self.fc1.backward(grads)
         grads = grads.reshape(self.flatten_shape)
         grads = self.relu1.backward(grads)
         grads = self.conv.backward(grads)
         return grads
+
+    def train(self):
+        self.dropout.train()
+
+    def eval(self):
+        self.dropout.eval()
     
     def load_model(self, param_list):
         with open(param_list, 'rb') as f:
             param_list = pickle.load(f)
 
-        self.__init__(lambda_list=None)
+        self.__init__(lambda_list=None, dropout_p=param_list.get('dropout_p', 0.0))
         for layer, params in zip([self.conv, self.fc1, self.fc2], param_list['params']):
             layer.W = params['W']
             layer.b = params['b']
@@ -152,6 +162,7 @@ class Model_CNN(Layer):
             'conv_channels': self.conv_channels,
             'hidden_dim': self.hidden_dim,
             'num_classes': self.num_classes,
+            'dropout_p': self.dropout_p,
             'params': [],
         }
         for layer in [self.conv, self.fc1, self.fc2]:

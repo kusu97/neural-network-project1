@@ -44,6 +44,7 @@ conda-env/
 # Logs
 logs/
 *.log
+analysis_results/
 
 
 # Temporary files

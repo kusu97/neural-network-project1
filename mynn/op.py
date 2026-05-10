@@ -182,6 +182,39 @@ class ReLU(Layer):
         output = np.where(self.input < 0, 0, grads)
         return output
 
+class Dropout(Layer):
+    """
+    Inverted dropout layer for regularization.
+    """
+    def __init__(self, p=0.5) -> None:
+        super().__init__()
+        assert 0 <= p < 1
+        self.p = p
+        self.training = True
+        self.mask = None
+        self.optimizable = False
+
+    def __call__(self, X):
+        return self.forward(X)
+
+    def forward(self, X):
+        if not self.training or self.p == 0:
+            self.mask = None
+            return X
+        self.mask = (np.random.rand(*X.shape) >= self.p) / (1 - self.p)
+        return X * self.mask
+
+    def backward(self, grads):
+        if self.mask is None:
+            return grads
+        return grads * self.mask
+
+    def train(self):
+        self.training = True
+
+    def eval(self):
+        self.training = False
+
 class MultiCrossEntropyLoss(Layer):
     """
     A multi-cross-entropy loss layer, with Softmax layer in it, which could be cancelled by method cancel_softmax

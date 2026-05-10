@@ -33,6 +33,8 @@ class RunnerM():
         best_score = 0
 
         for epoch in range(num_epochs):
+            if hasattr(self.model, 'train'):
+                self.model.train()
             X, y = train_set
 
             assert X.shape[0] == y.shape[0]
@@ -79,10 +81,14 @@ class RunnerM():
         self.best_score = best_score
 
     def evaluate(self, data_set):
+        if hasattr(self.model, 'eval'):
+            self.model.eval()
         X, y = data_set
         logits = self.model(X)
         loss = self.loss_fn(logits, y)
         score = self.metric(logits, y)
+        if hasattr(self.model, 'train'):
+            self.model.train()
         return score, loss
     
     def save_model(self, save_path):
