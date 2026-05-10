@@ -3,9 +3,6 @@ channels:
   - defaults
 dependencies:
   - python=3.12
-  - numpy
-  - matplotlib
-  - tqdm
-  - pip
-  - pip:
-      - pypdf
+  - numpy>=2.0
+  - matplotlib>=3.8
+  - tqdm>=4.66
